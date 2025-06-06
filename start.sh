@@ -19,6 +19,3 @@ cd ..
 
 echo "Backend service started with PID: $BACKEND_PID"
 echo "Frontend service started with PID: $FRONTEND_PID"
-
-wait $BACKEND_PID
-wait $FRONTEND_PID
