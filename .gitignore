@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Node
+node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# 环境变量和配置
+.env
+.env.*
+
+# 本地部署工具和地图数据
+backend/map-all/
+backend/target/
+
+# 本地生成的地图和下载包
+backend/downloads/
+backend/maps/
+
+
+# 其他
+*.tar.gz
+*.zip
