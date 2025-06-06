@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import List
 import shutil
 import os
-from data import MapTask, TASKS, TaskStatus
+from data import MapTask, TASKS, TaskStatus, save_tasks, load_tasks
 
 app = FastAPI()
 
@@ -23,10 +23,13 @@ DOWNLOAD_DIR = "downloads"
 os.makedirs(MAP_OUTPUT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+load_tasks()
+
 def run_map_production(task_id: str):
     task = TASKS[task_id]
     task.status = TaskStatus.RUNNING
     task.updated_at = datetime.now()
+    save_tasks()
     try:
         # 1. 构建地图生产命令并执行
         import subprocess
@@ -46,6 +49,7 @@ def run_map_production(task_id: str):
             task.status = TaskStatus.FAILED
             task.error = str(e)
             task.updated_at = datetime.now()
+            save_tasks()
             return
         # 2. 调用 geojson 生成工具
         geojson_tool = os.path.abspath(os.path.join(os.path.dirname(__file__), "target/bin/navi_map/tools/hmgeojson_app"))
@@ -61,6 +65,7 @@ def run_map_production(task_id: str):
             task.status = TaskStatus.FAILED
             task.error = str(e)
             task.updated_at = datetime.now()
+            save_tasks()
             return
         # 3. 打包为tar.gz
         tar_path = os.path.join(DOWNLOAD_DIR, f"{task_id}.tar.gz")
@@ -71,10 +76,12 @@ def run_map_production(task_id: str):
         task.download_url = f"/download/{task_id}"
         task.status = TaskStatus.SUCCESS
         task.updated_at = datetime.now()
+        save_tasks()
     except Exception as e:
         task.status = TaskStatus.FAILED
         task.error = str(e)
         task.updated_at = datetime.now()
+        save_tasks()
 
 @app.post("/tasks", response_model=MapTask)
 def submit_task(lat: float, lng: float, range_m: int, name: str, remark: str = "", background_tasks: BackgroundTasks = None):
@@ -91,6 +98,7 @@ def submit_task(lat: float, lng: float, range_m: int, name: str, remark: str = "
         updated_at=now
     )
     TASKS[task_id] = task
+    save_tasks()
     background_tasks.add_task(run_map_production, task_id)
     return task
 

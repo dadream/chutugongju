@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert, Button } from "@mui/material";
 import axios from "axios";
+import { TablePagination } from "@mui/material";
 
 const API_BASE = "http://localhost:8000";
 
@@ -15,6 +16,9 @@ function TaskList() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -31,17 +35,33 @@ function TaskList() {
 
   useEffect(() => {
     fetchTasks();
-    const timer = setInterval(fetchTasks, 3000);
+    if (!autoRefresh) return;
+    const timer = setInterval(fetchTasks, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [autoRefresh]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box sx={{ mt: 2 }}>
+      <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography variant="h6">任务列表</Typography>
+        <Button size="small" variant={autoRefresh ? "contained" : "outlined"} onClick={() => setAutoRefresh(!autoRefresh)}>
+          {autoRefresh ? "自动刷新中" : "手动刷新"}
+        </Button>
+      </Box>
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
       {!loading && !error && (
-        <TableContainer component={Paper}>
-          <Table size="small">
+        <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>名称</TableCell>
@@ -54,7 +74,7 @@ function TaskList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tasks.map((task) => (
+              {tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task) => (
                 <TableRow key={task.id}>
                   <TableCell>{task.name}</TableCell>
                   <TableCell>{task.lng}</TableCell>
@@ -78,6 +98,15 @@ function TaskList() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 20]}
+            component="div"
+            count={tasks.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </TableContainer>
       )}
     </Box>

@@ -6,7 +6,7 @@ import TaskList from "./TaskList";
 function App() {
   const [tab, setTab] = useState(0);
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" align="center" gutterBottom>
         地图生产任务系统
       </Typography>
