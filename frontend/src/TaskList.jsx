@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert, Button } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert, Button, TextField } from "@mui/material";
 import axios from "axios";
 import { TablePagination } from "@mui/material";
 
@@ -19,6 +19,7 @@ function TaskList() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -38,7 +39,7 @@ function TaskList() {
     if (!autoRefresh) return;
     const timer = setInterval(fetchTasks, 5000);
     return () => clearInterval(timer);
-  }, [autoRefresh]);
+  }, [autoRefresh, searchTerm]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -49,10 +50,22 @@ function TaskList() {
     setPage(0);
   };
 
+  const filteredTasks = tasks.filter(task =>
+    task.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Box sx={{ mt: 2 }}>
       <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="h6">任务列表</Typography>
+        <TextField
+          label="搜索任务名称"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ mr: 2 }}
+        />
         <Button size="small" variant={autoRefresh ? "contained" : "outlined"} onClick={() => setAutoRefresh(!autoRefresh)}>
           {autoRefresh ? "自动刷新中" : "手动刷新"}
         </Button>
@@ -74,7 +87,7 @@ function TaskList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task) => (
+              {filteredTasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task) => (
                 <TableRow key={task.id}>
                   <TableCell>{task.name}</TableCell>
                   <TableCell>{task.lng}</TableCell>
