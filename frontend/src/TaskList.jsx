@@ -3,7 +3,7 @@ import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead
 import axios from "axios";
 import { TablePagination } from "@mui/material";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 const statusColor = {
   "排队": "default",
