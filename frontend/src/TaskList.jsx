@@ -89,7 +89,7 @@ function TaskList() {
             <TableHead>
               <TableRow>
                 <TableCell>名称</TableCell>
-                <TableCell>经度</TableCell>.
+                <TableCell>经度</TableCell>
                 <TableCell>纬度</TableCell>
                 <TableCell>范围(m)</TableCell>
                 <TableCell>备注</TableCell>

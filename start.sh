@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# 杀死之前运行的进程
+kill $(ps aux | grep 'uvicorn main:app' | awk '{print $2}') 2>/dev/null
+kill $(ps aux | grep 'npm run dev' | awk '{print $2}') 2>/dev/null
+fuser -k 8000/tcp 2>/dev/null
+fuser -k 5173/tcp 2>/dev/null
+
 # 启动后端服务
 echo "Starting backend service..."
 cd backend
