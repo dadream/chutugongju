@@ -106,6 +106,14 @@ def submit_task(lat: float, lng: float, range_m: int, name: str, remark: str = "
 def list_tasks():
     return list(TASKS.values())
 
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: str):
+    if task_id not in TASKS:
+        raise HTTPException(status_code=404, detail="Task not found")
+    del TASKS[task_id]
+    save_tasks()
+    return {"message": "Task deleted successfully"}
+
 @app.get("/download/{task_id}")
 def download_map(task_id: str):
     tar_path = os.path.join(DOWNLOAD_DIR, f"{task_id}.tar.gz")
