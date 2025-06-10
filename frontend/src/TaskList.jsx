@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert, Button, TextField } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Chip, CircularProgress, Alert, Button, TextField, IconButton } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import { TablePagination } from "@mui/material";
 
@@ -54,6 +55,16 @@ function TaskList() {
     task.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('确定要删除该任务吗？')) return;
+    try {
+      await axios.delete(`${API_BASE}/tasks/${id}`);
+      setTasks(tasks.filter(task => task.id !== id));
+    } catch (err) {
+      alert('删除失败，请稍后重试。');
+    }
+  };
+
   return (
     <Box sx={{ mt: 2 }}>
       <Box sx={{ mb: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -78,12 +89,13 @@ function TaskList() {
             <TableHead>
               <TableRow>
                 <TableCell>名称</TableCell>
-                <TableCell>经度</TableCell>
+                <TableCell>经度</TableCell>.
                 <TableCell>纬度</TableCell>
                 <TableCell>范围(m)</TableCell>
                 <TableCell>备注</TableCell>
                 <TableCell>状态</TableCell>
                 <TableCell>下载</TableCell>
+                <TableCell>操作</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -106,6 +118,11 @@ function TaskList() {
                     ) : (
                       "-"
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton aria-label="delete" color="error" size="small" onClick={() => handleDelete(task.id)}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}

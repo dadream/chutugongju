@@ -69,7 +69,7 @@ def run_map_production(task_id: str):
             return
         # 3. 打包为tar.gz
         tar_path = os.path.join(DOWNLOAD_DIR, f"{task_id}.tar.gz")
-        shutil.make_archive(base_name=tar_path[:-7], format="gztar", root_dir=output_dir, base_dir=map_output_path)
+        shutil.make_archive(base_name=tar_path[:-7], format="gztar", root_dir=os.path.dirname(map_output_path), base_dir=os.path.basename(map_output_path))
         # 4. 删除原始目录
         shutil.rmtree(map_output_path)
         # 5. 生成下载链接
